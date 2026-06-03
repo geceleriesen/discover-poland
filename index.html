@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>DISCOVER POLAND – Virtual Museum | BCAL × eTwinning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5/build/pannellum.css"/>
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5/build/pannellum.js"></script>
+
+<style>
+:root {
+  --gold: #c9a84c; --gold2: #e8c97a; --gold3: #7a5c1a;
+  --deep: #080502; --border: rgba(201,168,76,.35);
+  --F-disp: 'Cinzel', serif; --F-ui: 'Barlow', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: var(--F-ui); color: #fff; }
+
+/* Preloader */
+#LOADER_SCREEN { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--deep); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.6s ease; }
+.loader-content { text-align: center; max-width: 500px; padding: 20px; }
+.loader-logo { font-family: var(--F-disp); font-size: 28px; color: var(--gold2); letter-spacing: 4px; margin-bottom: 30px; }
+.progress-track { width: 300px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 10px; margin: 20px auto; overflow: hidden; }
+#LD_BAR { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold2)); transition: width 0.3s ease; }
+#LD_MSG { font-size: 14px; color: #a49e95; font-weight: 300; }
+
+/* Container & UI */
+#MUSEUM_CONTAINER { width: 100%; height: 100%; display: none; opacity: 0; transition: opacity 0.8s ease; position: relative; }
+#panorama { width: 100vw; height: 100vh; background: #000; }
+.info-panel { position: absolute; top: 25px; left: 25px; z-index: 1000; background: rgba(8, 5, 2, 0.9); border: 1px solid var(--border); padding: 20px 25px; border-radius: 16px; max-width: 420px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); pointer-events: auto; }
+.info-panel h1 { font-family: var(--F-disp); font-size: 24px; color: var(--gold2); margin-bottom: 6px; }
+.info-panel p { font-size: 15px; color: #cfc9be; line-height: 1.5; font-weight: 300; }
+.brand-logo { position: absolute; top: 25px; right: 25px; z-index: 1000; height: 50px; }
+.etwinning-logo { position: absolute; bottom: 25px; right: 25px; z-index: 1000; height: 45px; opacity: 0.8; }
+.floating-actions { position: absolute; bottom: 25px; left: 25px; z-index: 1000; }
+
+/* Butonlar & Yönlendirmeler */
+.btn-premium-3d { background: linear-gradient(135deg, var(--gold2) 0%, var(--gold) 100%); color: var(--deep); font-family: var(--F-ui); font-weight: 700; font-size: 14px; padding: 13px 28px; border: none; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 0 var(--gold3), 0 8px 20px rgba(0,0,0,0.4); transition: transform 0.1s; text-transform: uppercase; }
+.btn-premium-3d:hover { background: linear-gradient(135deg, #f3da97 0%, #d3b45c 100%); }
+.btn-premium-3d:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold3); }
+
+.navigation-hotspot { background: none !important; border: none !important; width: auto !important; height: auto !important; }
+.traffic-blue-sign { background-color: #0b3d91; border: 3px solid #ffffff; border-radius: 14px; padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); width: 230px; display: flex; flex-direction: column; align-items: center; transition: transform 0.2s; }
+.traffic-blue-sign:hover { transform: scale(1.06) translateY(-4px); }
+.touristic-brown-box { background-color: #5c3a21; border: 2px solid #ffffff; border-radius: 8px; width: 100%; padding: 10px 12px; text-align: center; color: #ffffff; }
+.touristic-brown-box .title-tr { font-size: 16px; font-weight: 700; }
+.touristic-brown-box .title-en { font-size: 13px; opacity: 0.85; margin-top: 3px; font-style: italic; }
+.sign-arrow { color: #ffffff; font-size: 34px; font-weight: bold; margin-top: 5px; line-height: 1; }
+
+.exhibit-hotspot-container { background: none !important; border: none !important; width: auto !important; height: auto !important; }
+.exhibit-btn-3d { background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%); border: 3px solid #ffffff; border-radius: 24px; color: #000000; font-family: var(--F-ui); font-weight: 700; font-size: 15px; padding: 10px 20px; cursor: pointer; box-shadow: 0 4px 0 #b36b00; transition: transform 0.1s; white-space: nowrap; }
+.exhibit-btn-3d:hover { transform: scale(1.05); }
+
+.guide-btn-3d { background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); border: 3px solid var(--gold); border-radius: 24px; color: var(--deep); font-family: var(--F-ui); font-weight: 700; font-size: 15px; padding: 10px 20px; cursor: pointer; box-shadow: 0 4px 0 #a38a3d; transition: transform 0.1s; white-space: nowrap; }
+.guide-btn-3d:hover { transform: scale(1.05); }
+
+/* Modallar */
+.modal-premium { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(4, 2, 1, 0.95); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.4s ease; }
+.modal-premium.show { display: flex; opacity: 1; }
+.modal-premium-content { background: var(--deep); border: 1px solid var(--border); color: #fff; max-width: 900px; width: 90%; padding: 40px; border-radius: 24px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); position: relative; max-height: 90vh; }
+.close-premium { position: absolute; top: 20px; right: 25px; font-size: 36px; cursor: pointer; color: var(--gold); }
+.close-premium:hover { color: #fff; }
+.gold-title { font-family: var(--F-disp); color: var(--gold2); text-align: center; margin-bottom: 30px; font-size: 26px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+
+.lang-flex { display: flex; gap: 40px; margin-bottom: 30px; flex-wrap: wrap; overflow-y: auto; max-height: 60vh;}
+.lang-column { flex: 1; min-width: 280px; }
+.lang-column h3 { color: var(--gold); font-size: 18px; margin-bottom: 12px; }
+.lang-column p { color: #cfc9be; font-size: 16px; line-height: 1.7; text-align: justify; }
+.modal-img-wrapper { width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+.modal-img-wrapper img { width: 100%; max-height: 400px; object-fit: cover; display: block; }
+
+.catalog-wrapper { display: flex; flex-direction: column; gap: 20px; max-height: 65vh; overflow-y: auto; padding-right: 15px; }
+.catalog-wrapper::-webkit-scrollbar { width: 8px; }
+.catalog-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
+.catalog-wrapper::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+.catalog-item { display: flex; gap: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.2); border-radius: 16px; padding: 15px; align-items: flex-start; transition: background 0.3s; }
+.catalog-item:hover { background: rgba(201,168,76,0.08); }
+.catalog-item img { width: 180px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; }
+.catalog-item-text { flex: 1; }
+.catalog-item-title { color: var(--gold2); font-size: 20px; margin-bottom: 10px; font-family: var(--F-disp); }
+.catalog-item-desc { color: #cfc9be; font-size: 14px; line-height: 1.5; margin-bottom: 8px; text-align: justify; }
+
+.quiz-option { background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.2); padding: 14px 20px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s ease; }
+.quiz-option:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div id="LOADER_SCREEN">
+  <div class="loader-content">
+    <div class="loader-logo">DISCOVER POLAND</div>
+    <div class="progress-track"><div id="LD_BAR"></div></div>
+    <div id="LD_MSG">Sistem başlatılıyor...</div>
+  </div>
+</div>
+
+<div id="MUSEUM_CONTAINER">
+  <div id="panorama"></div>
+
+  <div class="info-panel">
+    <h1 id="scene-title">Ana Giriş Holü</h1>
+    <p id="scene-desc">Hoş geldiniz! Polonya macerası başlıyor 🇵🇱</p>
+  </div>
+
+  <img src="./images/bcallogo.jpeg" class="brand-logo" alt="BCAL Logo" onerror="this.style.display='none'">
+  <img src="./images/etwinning.png" class="etwinning-logo" alt="eTwinning" onerror="this.style.display='none'">
+
+  <div class="floating-actions">
+    <button class="btn-premium-3d" onclick="openQuiz()">Yarışma & Sertifika</button>
+  </div>
+</div>
+
+<div id="exhibit-modal" class="modal-premium">
+  <div class="modal-premium-content">
+    <span class="close-premium" onclick="closeModal('exhibit-modal')">&times;</span>
+    <h2 id="modal-title" class="gold-title">Eser Detayı</h2>
+    <div class="lang-flex">
+      <div class="lang-column"><h3>🇹🇷 Türkçe</h3><p id="modal-tr"></p></div>
+      <div class="lang-column"><h3>🇬🇧 English</h3><p id="modal-en"></p></div>
+    </div>
+    <div class="modal-img-wrapper">
+      <img id="modal-image" src="" alt="Exhibit Image" onerror="this.onerror=null; this.src='https://placehold.co/800x400/080502/c9a84c?text=Gorsel+Bekleniyor...&font=montserrat'">
+    </div>
+  </div>
+</div>
+
+<div id="catalog-modal" class="modal-premium">
+  <div class="modal-premium-content" style="max-width: 1000px;">
+    <span class="close-premium" onclick="closeModal('catalog-modal')">&times;</span>
+    <h2 class="gold-title">Müze Rehberi & Eser Kataloğu</h2>
+    <div id="catalog-wrapper" class="catalog-wrapper"></div>
+  </div>
+</div>
+
+<div id="quiz-modal" class="modal-premium">
+  <div class="modal-premium-content" style="max-width: 600px;">
+    <span class="close-premium" onclick="closeModal('quiz-modal')">&times;</span>
+    <h2 class="gold-title">MÜZE QUİZİ</h2>
+    <div id="quiz-wrapper"></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var bar = document.getElementById('LD_BAR'), msg = document.getElementById('LD_MSG');
+  var steps = [ [12, 'Müze cephesi yükleniyor...'], [40, 'Katalog hazırlanıyor...'], [75, 'Çift dilli paneller optimize ediliyor...'], [100, 'Müzeniz hazır!'] ];
+  var stepIndex = 0;
+  var progressInterval = setInterval(function() {
+    if (stepIndex < steps.length) {
+      if (bar) bar.style.width = steps[stepIndex][0] + '%';
+      if (msg) msg.textContent = steps[stepIndex][1];
+      if (steps[stepIndex][0] === 100) {
+        clearInterval(progressInterval);
+        setTimeout(function() {
+          var loader = document.getElementById('LOADER_SCREEN'), museum = document.getElementById('MUSEUM_CONTAINER');
+          if (loader) loader.style.opacity = '0';
+          setTimeout(function() {
+            if (loader) loader.style.display = 'none';
+            if (museum) { museum.style.display = 'block'; museum.style.opacity = '1'; }
+            initPannellumViewer();
+          }, 600);
+        }, 800);
+      }
+      stepIndex++;
+    } else { clearInterval(progressInterval); }
+  }, 300);
+});
+
+function createSignpostElement(hotSpotDiv, args) {
+  hotSpotDiv.classList.add('navigation-hotspot');
+  hotSpotDiv.innerHTML = `<div class="traffic-blue-sign"><div class="touristic-brown-box"><div class="title-tr">${args.titleTr}</div><div class="title-en">${args.titleEn}</div></div><div class="sign-arrow">${args.arrow}</div></div>`;
+}
+function createExhibitElement(hotSpotDiv, args) { hotSpotDiv.classList.add('exhibit-hotspot-container'); hotSpotDiv.innerHTML = `<button class="exhibit-btn-3d"><span>${args.icon}</span> ${args.text}</button>`; }
+function createGuideElement(hotSpotDiv, args) { hotSpotDiv.classList.add('exhibit-hotspot-container'); hotSpotDiv.innerHTML = `<button class="guide-btn-3d"><span>${args.icon}</span> ${args.text}</button>`; }
+
+var viewer;
+function initPannellumViewer() {
+  viewer = pannellum.viewer('panorama', {
+    "default": { "firstScene": "entrance", "sceneFadeDuration": 1200, "autoLoad": true, "compass": false },
+    "scenes": {
+      "entrance": {
+        "type": "equirectangular", "panorama": "./images/entrance.jpg", "hfov": 100, "pitch": -12, "yaw": 0,
+        "hotSpots": [
+          // Rehber butonunu çakışmaması için biraz sola (yaw: -30) ve aşağıya (pitch: -45) kaydırdık
+          { "pitch": -45, "yaw": -30, "type": "custom", "createTooltipFunc": createGuideElement, "createTooltipArgs": { "icon": "📖", "text": "Müze Rehberi" }, "clickHandlerFunc": function() { openCatalog(); }},
+          // Yönlendirme oklarının pitch değerlerini -38 yaparak aşağı indirdik
+          { "pitch": -38, "yaw": 32, "type": "scene", "sceneId": "room1", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Gelenekler Odası", "titleEn": "Traditions Room", "arrow": "↗" }},
+          { "pitch": -38, "yaw": 125, "type": "scene", "sceneId": "room2", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Anıtlar Odası", "titleEn": "Monuments Room", "arrow": "↘" }},
+          { "pitch": -38, "yaw": -75, "type": "scene", "sceneId": "room3", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Gastronomi Odası", "titleEn": "Gastronomy Room", "arrow": "↖" }},
+          { "pitch": -25, "yaw": 178, "type": "scene", "sceneId": "exit", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Çıkış Holü", "titleEn": "Exit Hall", "arrow": "⬇" }}
+        ]
+      },
+      "room1": {
+        "type": "equirectangular", "panorama": "./images/room1.jpg", "hfov": 105, "pitch": -8, "yaw": 0,
+        "hotSpots": [
+          { "pitch": -45, "yaw": -30, "type": "custom", "createTooltipFunc": createGuideElement, "createTooltipArgs": { "icon": "📖", "text": "Müze Rehberi" }, "clickHandlerFunc": function() { openCatalog(); }},
+          { "pitch": -35, "yaw": 25, "type": "scene", "sceneId": "entrance", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Giriş Holü", "titleEn": "Entrance Hall", "arrow": "↗" }},
+          { "pitch": -35, "yaw": 160, "type": "scene", "sceneId": "room2", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Anıtlar Odası", "titleEn": "Monuments Room", "arrow": "↘" }},
+          { "pitch": -23, "yaw": 52, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🎄", "text": "Wigilia" }, "clickHandlerFunc": function() { openExhibit("wigilia"); }},
+          { "pitch": -21, "yaw": -40, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🌸", "text": "Wianki" }, "clickHandlerFunc": function() { openExhibit("wianki"); }},
+          { "pitch": -25, "yaw": 132, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🌾", "text": "Dożynki" }, "clickHandlerFunc": function() { openExhibit("dozynki"); }}
+        ]
+      },
+      "room2": {
+        "type": "equirectangular", "panorama": "./images/room2.jpg", "hfov": 105, "pitch": -8, "yaw": 0,
+        "hotSpots": [
+          { "pitch": -45, "yaw": -30, "type": "custom", "createTooltipFunc": createGuideElement, "createTooltipArgs": { "icon": "📖", "text": "Müze Rehberi" }, "clickHandlerFunc": function() { openCatalog(); }},
+          { "pitch": -35, "yaw": 25, "type": "scene", "sceneId": "entrance", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Giriş Holü", "titleEn": "Entrance Hall", "arrow": "↗" }},
+          { "pitch": -35, "yaw": 165, "type": "scene", "sceneId": "room3", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Gastronomi Odası", "titleEn": "Gastronomy Room", "arrow": "↘" }},
+          { "pitch": -21, "yaw": 58, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🏰", "text": "Wawel Kalesi" }, "clickHandlerFunc": function() { openExhibit("wawel"); }},
+          { "pitch": -21, "yaw": -52, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🏰", "text": "Malbork Kalesi" }, "clickHandlerFunc": function() { openExhibit("malbork"); }},
+          { "pitch": -19, "yaw": 130, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🧂", "text": "Wieliczka" }, "clickHandlerFunc": function() { openExhibit("wieliczka"); }}
+        ]
+      },
+      "room3": {
+        "type": "equirectangular", "panorama": "./images/room3.jpg", "hfov": 105, "pitch": -8, "yaw": 0,
+        "hotSpots": [
+          { "pitch": -45, "yaw": -30, "type": "custom", "createTooltipFunc": createGuideElement, "createTooltipArgs": { "icon": "📖", "text": "Müze Rehberi" }, "clickHandlerFunc": function() { openCatalog(); }},
+          { "pitch": -35, "yaw": 25, "type": "scene", "sceneId": "entrance", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Giriş Holü", "titleEn": "Entrance Hall", "arrow": "↗" }},
+          { "pitch": -35, "yaw": 165, "type": "scene", "sceneId": "exit", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Çıkış Holü", "titleEn": "Exit Hall", "arrow": "↘" }},
+          { "pitch": -20, "yaw": 48, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🥟", "text": "Pierogi" }, "clickHandlerFunc": function() { openExhibit("pierogi"); }},
+          { "pitch": -19, "yaw": -46, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🍩", "text": "Pączki" }, "clickHandlerFunc": function() { openExhibit("paczki"); }},
+          { "pitch": -23, "yaw": 122, "type": "custom", "createTooltipFunc": createExhibitElement, "createTooltipArgs": { "icon": "🥘", "text": "Bigos" }, "clickHandlerFunc": function() { openExhibit("bigos"); }}
+        ]
+      },
+      "exit": {
+        "type": "equirectangular", "panorama": "./images/exit.jpg", "hfov": 105, "pitch": -8, "yaw": 0,
+        "hotSpots": [
+          { "pitch": -45, "yaw": -30, "type": "custom", "createTooltipFunc": createGuideElement, "createTooltipArgs": { "icon": "📖", "text": "Müze Rehberi" }, "clickHandlerFunc": function() { openCatalog(); }},
+          { "pitch": -35, "yaw": -22, "type": "scene", "sceneId": "entrance", "createTooltipFunc": createSignpostElement, "createTooltipArgs": { "titleTr": "Başlangıca Dön", "titleEn": "Back to Entrance", "arrow": "↖" }}
+        ]
+      }
+    }
+  });
+
+  viewer.on('scenechange', function(sceneId) {
+    var content = { entrance: { title: "Ana Giriş Holü", desc: "Hoş geldiniz! Polonya macerası başlıyor 🇵🇱" }, room1: { title: "Oda 1 – Polonya Gelenekleri", desc: "Renkli festivaller, köklü adetler ve anlamlı bayramlar." }, room2: { title: "Oda 2 – Polonya Anıtları", desc: "Muhteşem gotik ve rönesans kaleleri ile koruma altındaki miras alanları." }, room3: { title: "Oda 3 – Polonya Gastronomisi", desc: "Milli lezzetler, asırlık tarifler ve enfes tatlılar." }, exit: { title: "Çıkış Holü", desc: "Bizi ziyaret ettiğiniz için teşekkür ederiz! Sertifikanızı almayı unutmayın." } };
+    if(content[sceneId]) { document.getElementById('scene-title').textContent = content[sceneId].title; document.getElementById('scene-desc').textContent = content[sceneId].desc; }
+  });
+}
+
+const exhibitData = {
+  wigilia: { title: "🎄 Wigilia (Noel Arifesi)", tr: "Wigilia, Polonya'da yılın en önemli kutlamasıdır. Aileler bir araya gelir, gökyüzünde ilk yıldız göründüğünde akşam yemeği başlar. Masada geleneksel olarak 12 çeşit etsiz yemek bulunur.", en: "Wigilia is the most crucial celebration of the year in Poland. Families gather, and dinner begins when the first star appears. Traditionally, there are 12 meatless dishes on the table.", image: "./images/wigilia.jpg" },
+  wianki: { title: "🌸 Wianki (Çelenk Festivali)", tr: "Kraków'da yaz gündönümünde kutlanan köklü bir festivaldir. Genç kadınlar hazırladıkları çiçek çelenklerini üzerlerine mumlar koyarak Vistül Nehri'ne bırakırlar.", en: "A deeply rooted festival celebrated during the summer solstice in Kraków. Young women place candles on handmade flower wreaths and float them down the Vistula River.", image: "./images/wianki.jpg" },
+  dozynki: { title: "🌾 Dożynki (Hasat Festivali)", tr: "Polonya genelinde hasat mevsiminin bitişini kutlamak için düzenlenen geleneksel bir şükran festivalidir. Çiftçiler tahıl ve çiçeklerden devasa, sanatsal çelenkler yaparlar.", en: "A traditional thanksgiving festival held across Poland to celebrate the end of the harvest season. Farmers create massive, artistic wreaths from grains and flowers.", image: "./images/dozynki.jpg" },
+  wawel: { title: "🏰 Wawel Kalesi", tr: "Kraków'da bulunan, yüzyıllar boyunca Polonya krallarına ev sahipliği yapmış tarihi ve kültürel bir kaledir. Gotik, Rönesans ve Barok mimarinin harika bir karışımıdır.", en: "Located in Kraków, this historic castle served as the official residence of Polish monarchs for centuries. A masterclass blend of Gothic, Renaissance, and Baroque architecture.", image: "./images/wawel.jpg" },
+  malbork: { title: "🏰 Malbork Kalesi", tr: "Töton Şövalyeleri tarafından inşa edilen, yüzey alanı bakımından dünyanın en büyük kalesi ve tuğladan yapılmış en büyük gotik yapısıdır.", en: "Built by the Teutonic Knights, it is the world's largest castle by land area and the largest brick Gothic structure. A UNESCO World Heritage site.", image: "./images/malbork.jpg" },
+  wieliczka: { title: "🧂 Wieliczka Tuz Madeni", tr: "13. yüzyıldan beri kesintisiz üretim yapmış, dünyanın en eski aktif tuz madenlerinden biridir. Yerin metrelerce altında tamamen tuzdan oyulmuş devasa katedraller barındırır.", en: "One of the world's oldest salt mines, operating since the 13th century. It is a breathtaking underground wonderland featuring massive cathedrals carved entirely from rock salt.", image: "./images/wieliczka.jpg" },
+  pierogi: { title: "🥟 Pierogi", tr: "Polonya mutfağının tüm dünyada en çok tanınan ve sevilen milli yemeğidir. Patates, peynir, kıyma veya meyvelerle doldurulan hamurların haşlanıp, tereyağında kızartılmasıyla servis edilir.", en: "The most widely recognized national dish of Polish cuisine worldwide. These signature dumplings are filled with savory potato, cheese, meat, or sweet fruits.", image: "./images/pierogi.jpg" },
+  paczki: { title: "🍩 Pączki", tr: "Polonya tarzı geleneksel çörek veya donut çeşididir. İçi genellikle yabani gül reçeli ile doldurulur, üzeri ise pudra şekeri ile kaplanır.", en: "A traditional Polish donut. They are typically filled with premium wild rose petal jam, fried to perfection, and covered with powdered sugar.", image: "./images/paczki.jpg" },
+  bigos: { title: "🥘 Bigos (Avcı Yahnisi)", tr: "Polonya'nın asırlık lezzetlerinden biri olan zengin avcı yahnisi. Fermente lahana (sauerkraut), çeşitli et türleri ve orman mantarlarının günlerce kısık ateşte pişirilmesiyle hazırlanır.", en: "A centuries-old Polish hunter's stew. It is prepared by slowly simmering finely shredded fresh cabbage, sauerkraut, wild mushrooms, and selected meats over multiple days.", image: "./images/bigos.jpg" }
+};
+
+function openCatalog() {
+  var wrapper = document.getElementById('catalog-wrapper'); wrapper.innerHTML = "";
+  for (const key in exhibitData) {
+    if (exhibitData.hasOwnProperty(key)) {
+      const item = exhibitData[key];
+      wrapper.innerHTML += `<div class="catalog-item"><img src="${item.image}" alt="${item.title}" onerror="this.onerror=null; this.src='https://placehold.co/180x120/080502/c9a84c?text=Gorsel+Yok'"><div class="catalog-item-text"><h3 class="catalog-item-title">${item.title}</h3><div class="catalog-item-desc"><strong>🇹🇷 TR:</strong> ${item.tr}</div><div class="catalog-item-desc"><strong>🇬🇧 EN:</strong> ${item.en}</div></div></div>`;
+    }
+  }
+  var modal = document.getElementById('catalog-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10);
+}
+
+function openExhibit(key) {
+  var data = exhibitData[key];
+  if(data) {
+    document.getElementById('modal-title').textContent = data.title; document.getElementById('modal-tr').textContent = data.tr; document.getElementById('modal-en').textContent = data.en;
+    var imgEl = document.getElementById('modal-image'); imgEl.src = data.image;
+    var modal = document.getElementById('exhibit-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10);
+  }
+}
+function closeModal(id) { var modal = document.getElementById(id); if(modal) { modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 400); } }
+
+const quizQuestions = [
+  { q: "Polonya'nın içi özel harçlarla doldurulan dünyaca ünlü milli mantısının adı nedir?", a: ["Bigos", "Pierogi", "Pączki", "Wigilia"], c: 1 },
+  { q: "Töton Şövalyeleri tarafından tuğladan inşa edilen, alanında dünyanın en büyük gotik yapısı hangisidir?", a: ["Wawel Kalesi", "Malbork Kalesi", "Wieliczka", "Kraków Sarayı"], c: 1 },
+  { q: "Geleneksel Wigilia Noel yemeği sofrasında kaç çeşit etsiz yemek bulunması gerekir?", a: ["7", "9", "12", "15"], c: 2 }
+];
+let currentQuestion = 0, userScore = 0;
+function openQuiz() { currentQuestion = 0; userScore = 0; var modal = document.getElementById('quiz-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10); renderQuestion(); }
+function renderQuestion() {
+  var wrapper = document.getElementById('quiz-wrapper');
+  if (currentQuestion < quizQuestions.length) {
+    var q = quizQuestions[currentQuestion]; let html = `<p style='font-size:18px; margin-bottom:20px; color:#cfc9be;'>Soru ${currentQuestion + 1}/${quizQuestions.length}: ${q.q}</p>`;
+    q.a.forEach((opt, idx) => { html += `<div class="quiz-option" onclick="checkAnswer(${idx})"><strong>${String.fromCharCode(65 + idx)})</strong> ${opt}</div>`; }); wrapper.innerHTML = html;
+  } else {
+    let successMsg = userScore === quizQuestions.length ? "Harika! Tam puan aldınız. 🏆" : "Tebrikler, müzeyi başarıyla tamamladınız!";
+    wrapper.innerHTML = `<div style='text-align:center; padding:20px;'><h3 style='color:var(--gold2); font-size:22px; margin-bottom:15px;'>Skorunuz: ${userScore} / ${quizQuestions.length}</h3><p style='color:#cfc9be; margin-bottom:25px;'>${successMsg}</p><button class="btn-premium-3d" onclick="closeModal('quiz-modal')">Kapat / Close</button></div>`;
+  }
+}
+function checkAnswer(idx) { if (idx === quizQuestions[currentQuestion].c) userScore++; currentQuestion++; renderQuestion(); }
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeModal('exhibit-modal'); closeModal('catalog-modal'); closeModal('quiz-modal'); } });
+</script>
+</body>
+</html>
